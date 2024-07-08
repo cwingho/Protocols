@@ -24,6 +24,7 @@ for subdir, _, files in os.walk('../protocols'):
 
     # Handle fields.json
     fields_json_path = os.path.join(subdir, 'fields.json')
+    t=''
     if os.path.exists(fields_json_path):
         # Handle fields.json
         with open(fields_json_path, 'r') as f:
