@@ -23,12 +23,15 @@ for subdir, _, files in os.walk('../protocols'):
     save_file_name = py_file[:-3]
 
     # Handle fields.json
-    with open(os.path.join(subdir, 'fields.json'), 'r') as f:
-        s = f.read()
-        data = json.loads(s)
-        data = {i['name']: (i['default'] if i['type'] != 'dropDown' else i['options'][0]['value']) for i in data}
-        data = json.dumps(data)
-        t = template.replace('{data}', data)
+    fields_json_path = os.path.join(subdir, 'fields.json')
+    if os.path.exists(fields_json_path):
+        # Handle fields.json
+        with open(fields_json_path, 'r') as f:
+            s = f.read()
+            data = json.loads(s)
+            data = {i['name']: (i['default'] if i['type'] != 'dropDown' else i['options'][0]['value']) for i in data}
+            data = json.dumps(data)
+            t = template.replace('{data}', data)
 
     # Handle .py
     with open(os.path.join(subdir, py_file), 'r') as f:
