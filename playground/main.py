@@ -17,8 +17,13 @@ def read_fields_json(fields_json_path):
     with open(fields_json_path, 'r') as f:
         s = f.read()
         data = json.loads(s)
-        data = {i['name']: (i['default'] if i['type'] != 'dropDown' else i['options'][0]['value']) for i in data}
-        return json.dumps(data)
+        processed_data = {}
+        for item in data:
+            value = item['default'] if item['type'] != 'dropDown' else item['options'][0]['value']
+            if isinstance(value, str):
+                value = value.replace('\n', '\\n')
+            processed_data[item['name']] = value
+        return json.dumps(processed_data)
 
 def insert_template_into_script(template, script_contents):
     """Inserts the template at the appropriate location in the script."""
