@@ -16,7 +16,11 @@ def get_module_name(module_id, modules):
 def process_file(file_path, output_dir):
     """Process a single JSON file to extract and sort deck information."""
     with open(file_path, 'r') as file:
-        data = json.load(file)
+        try:
+            data = json.load(file)
+        except Exception as e:
+            print(file_path)
+            raise
         labware = data['labware']
         modules = data['modules']
     
