@@ -80,7 +80,7 @@ async def get_conv_id(session):
 
 async def gen_cmd(session, conv_id, cmd):
     url = f"http://localhost:8000/llm/gen_cmd/{conv_id}"
-    timeout = httpx.Timeout(15.0, read=None)  # Set a higher read timeout
+    timeout = httpx.Timeout(None)  # Set a higher read timeout
 
     async with httpx.AsyncClient(timeout=timeout) as client:
         data = {"data": cmd}
@@ -89,16 +89,18 @@ async def gen_cmd(session, conv_id, cmd):
                 pass
     return True
 
-
 async def handle_request(semaphore, session, cmd):
     async with semaphore:
-        conv_id = await get_conv_id(session)
-        result = await gen_cmd(session, conv_id, cmd)
+        try:
+            conv_id = await get_conv_id(session)
+            result = await gen_cmd(session, conv_id, cmd)
+        except Exception as e:
+            print(f'failed with conv_id: {conv_id}. Error: {e}')
+            return False
         return result
 
-
 async def main(commands):
-    semaphore = asyncio.Semaphore(10)  # Limit to 10 concurrent requests
+    semaphore = asyncio.Semaphore(4)  # Limit to 10 concurrent requests
     async with aiohttp.ClientSession() as session:
         tasks = [handle_request(semaphore, session, cmd) for cmd in commands]
         results = []
